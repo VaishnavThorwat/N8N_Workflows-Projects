@@ -1,0 +1,1163 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "https://preview--homebot-connect.lovable.app/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        64,
+        352
+      ],
+      "id": "ec8a7af3-a146-4798-9ed1-227ba5d3b89c",
+      "name": "Webhook",
+      "webhookId": "b3ce7968-622d-47ff-8374-86df3997a20e"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a real estate sales qualification assistant.\n\nGiven the following lead data:\n- Name: {{ $json.body.fullName }}\n- Property Type: {{ $json.body.propertyType }}\n- Budget:{{ $json.body.budgetRange }}\n- Location: {{ $json.body.locations }}\n- Buying Timeline: {{ $json.body.timeline }}\n\n1. Classify this lead as \"Hot\", \"Warm\", or \"Cold\".\n   - Hot: Immediate buying intent + good budget\n   - Warm: 3-6 months intent or budget close to requirement\n   - Cold: Later timeline or low budget\n\n2. Summarize in 2-3 short bullet points.\n\nOutput strictly in JSON format:\n{\n  \"lead_score\": \"Hot/Warm/Cold\",\n  \"summary\": \"short summary\"\n}\n\nLead Details:\n- Name: {{ $json.body.fullName }}\n- Property Type:{{ $json.body.propertyType }}\n- Budget: {{ $json.body.budgetRange }}\n- Preferred Locations: {{ $json.body.locations }}\n- Timeline to Buy: {{ $json.body.timeline }}\n- First-Time Buyer:{{ $json.body.firstTimeBuyer }} \n\nReply in this format:\n{\n  \"score\": [1-10],\n  \"remarks\": \"Your analysis about how serious this buyer is\"\n}\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        240,
+        352
+      ],
+      "id": "f628637f-7f8d-4bfa-bb7f-9282065cb2b9",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "zHNhnSmGypAVv0z4",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "76e3a5b7-0f4a-476b-9815-818156e444de",
+              "name": " \"lead_score\"",
+              "value": "Hot",
+              "type": "string"
+            },
+            {
+              "id": "d4cf3654-1100-41f8-9488-c4955d2eb0eb",
+              "name": " \"summary\"",
+              "value": "\"Lead is looking to buy an apartment within 1-3 months.\",\\n \"Budget of 1m-2m aligns well with market requirements.\",\\n \"Gorman is the preferred location, showing clear intent.\"",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        544,
+        352
+      ],
+      "id": "a17ee108-7050-4dd5-8b7d-3636084c8028",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "content": "# Real Estate – AI Sales Qualification Bot\n",
+        "height": 832,
+        "width": 1808,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -16,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "9dbcea4d-bac8-4695-b0e6-611adc5937ae",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "apptL28VO4qEMwXR5",
+          "mode": "list",
+          "cachedResultName": "n8",
+          "cachedResultUrl": "https://airtable.com/apptL28VO4qEMwXR5"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblm2YO55MfY6W02R",
+          "mode": "list",
+          "cachedResultName": "All_Leads",
+          "cachedResultUrl": "https://airtable.com/apptL28VO4qEMwXR5/tblm2YO55MfY6W02R"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Summary": "={{ $json[' \"summary\"'] }}",
+            "Lead Score": "={{ $json[' \"lead_score\"'] }}",
+            "Name": "={{ $('Webhook').item.json.body.fullName }}",
+            "Email": "={{ $('Webhook').item.json.body.email }}",
+            "Property Type": "={{ $('Webhook').item.json.body.propertyType }}",
+            "Budget": "={{ $('Webhook').item.json.body.budgetRange }}",
+            "Location": "={{ $('Webhook').item.json.body.locations }}",
+            "Timeline": "={{ $('Webhook').item.json.body.timeline }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Property Type",
+              "displayName": "Property Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Timeline",
+              "displayName": "Timeline",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Lead Score",
+              "displayName": "Lead Score",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Hot",
+                  "value": "Hot"
+                },
+                {
+                  "name": "Warm",
+                  "value": "Warm"
+                },
+                {
+                  "name": "Cold",
+                  "value": "Cold"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Date Added (Auto)",
+              "displayName": "Date Added (Auto)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        736,
+        352
+      ],
+      "id": "aadaddb6-6f5e-4b3b-8566-a29012b984c7",
+      "name": "Create or update a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "2pBMp1aHn5IdkBwJ",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.fields['Lead Score'] }}",
+                    "rightValue": "Hot",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "8e7262b6-f86c-4d82-bd2e-c8eb73c288f4"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f756420c-7bee-46b6-8255-6a9bfcdc20b0",
+                    "leftValue": "={{ $json.fields['Lead Score'] }}",
+                    "rightValue": "Warm",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "632a2a0b-2fed-46bb-8c89-115832122019",
+                    "leftValue": "={{ $json.fields['Lead Score'] }}",
+                    "rightValue": "Cold",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        944,
+        336
+      ],
+      "id": "bc490d0e-b435-4497-9f0e-6ab97eb00a0f",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Webhook').item.json.body.email }}",
+        "subject": "Thank you for your interest in Our Services",
+        "emailType": "text",
+        "message": "=Hi {{ $('Webhook').item.json.body.fullName }}, thanks for sharing your requirements. Our team will get back to you shortly with property options.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1600,
+        128
+      ],
+      "id": "5a3595d1-a6a8-42f0-9e69-d396d9fbf853",
+      "name": "Send a message1",
+      "webhookId": "6ac77638-2880-4458-9289-38f5093dddca",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "CC1qAZTts7Q85PpX",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "apptL28VO4qEMwXR5",
+          "mode": "list",
+          "cachedResultName": "n8",
+          "cachedResultUrl": "https://airtable.com/apptL28VO4qEMwXR5"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblAAYTlfByVcjFJh",
+          "mode": "list",
+          "cachedResultName": "Warm",
+          "cachedResultUrl": "https://airtable.com/apptL28VO4qEMwXR5/tblAAYTlfByVcjFJh"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.fields.Name }}",
+            "Email": "={{ $json.fields.Email }}",
+            "Summary": "={{ $json.fields.Summary }}",
+            "Lead Score": "={{ $json.fields['Lead Score'] }}",
+            "Budget": "={{ $json.fields.Budget }}",
+            "Property Type": "={{ $json.fields['Property Type'] }}",
+            "Location": "={{ $json.fields.Location }}",
+            "Timeline": "={{ $json.fields.Timeline }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Property Type",
+              "displayName": "Property Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Timeline",
+              "displayName": "Timeline",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Lead Score",
+              "displayName": "Lead Score",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Hot",
+                  "value": "Hot"
+                },
+                {
+                  "name": "Warm",
+                  "value": "Warm"
+                },
+                {
+                  "name": "Cold",
+                  "value": "Cold"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Date Added (Auto)",
+              "displayName": "Date Added (Auto)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1184,
+        352
+      ],
+      "id": "57334f25-dd9e-473a-bc89-8bf827d63b38",
+      "name": "Create a record1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "2pBMp1aHn5IdkBwJ",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Webhook').item.json.body.email }}",
+        "subject": "Thank you for your interest in Our Services",
+        "emailType": "text",
+        "message": "=Hi , we’ll let you know when a property matching your needs becomes available.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1392,
+        352
+      ],
+      "id": "deb7660d-8ec6-43cf-ac2e-913560eb21e5",
+      "name": "Send a message2",
+      "webhookId": "6ac77638-2880-4458-9289-38f5093dddca",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "CC1qAZTts7Q85PpX",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "apptL28VO4qEMwXR5",
+          "mode": "list",
+          "cachedResultName": "n8",
+          "cachedResultUrl": "https://airtable.com/apptL28VO4qEMwXR5"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblXR3Evq40TZZXu4",
+          "mode": "list",
+          "cachedResultName": "Cold",
+          "cachedResultUrl": "https://airtable.com/apptL28VO4qEMwXR5/tblXR3Evq40TZZXu4"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.fields.Name }}",
+            "Email": "={{ $json.fields.Email }}",
+            "Summary": "={{ $json.fields.Summary }}",
+            "Lead Score": "={{ $json.fields['Lead Score'] }}",
+            "Budget": "={{ $json.fields.Budget }}",
+            "Property Type": "={{ $json.fields['Property Type'] }}",
+            "Location": "={{ $json.fields.Location }}",
+            "Timeline": "={{ $json.fields.Timeline }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Property Type",
+              "displayName": "Property Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Timeline",
+              "displayName": "Timeline",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Lead Score",
+              "displayName": "Lead Score",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Hot",
+                  "value": "Hot"
+                },
+                {
+                  "name": "Warm",
+                  "value": "Warm"
+                },
+                {
+                  "name": "Cold",
+                  "value": "Cold"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Date Added (Auto)",
+              "displayName": "Date Added (Auto)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1184,
+        608
+      ],
+      "id": "5a0736d1-46ea-48b8-aeef-89ed94602715",
+      "name": "Create a record2",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "2pBMp1aHn5IdkBwJ",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Webhook').item.json.body.email }}",
+        "subject": "We’ll keep you updated",
+        "emailType": "text",
+        "message": "=Hi {{ $('Webhook').item.json.body.fullName }}, thanks for sharing your requirements. Our team will get back to you shortly with property options.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1392,
+        608
+      ],
+      "id": "fbc320c2-ec46-4f27-bf34-6a5710898efc",
+      "name": "Send a message3",
+      "webhookId": "6ac77638-2880-4458-9289-38f5093dddca",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "CC1qAZTts7Q85PpX",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Hot Leads ",
+        "height": 224,
+        "width": 608,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1136,
+        64
+      ],
+      "typeVersion": 1,
+      "id": "e593d227-c81a-4c32-8380-9cf6856deefe",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "apptL28VO4qEMwXR5",
+          "mode": "list",
+          "cachedResultName": "n8",
+          "cachedResultUrl": "https://airtable.com/apptL28VO4qEMwXR5"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblaZWmnL3OO2YmND",
+          "mode": "list",
+          "cachedResultName": "Hot",
+          "cachedResultUrl": "https://airtable.com/apptL28VO4qEMwXR5/tblaZWmnL3OO2YmND"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.fields.Name }}",
+            "Email": "={{ $json.fields.Email }}",
+            "Summary": "={{ $json.fields.Summary }}",
+            "Lead Score": "={{ $json.fields['Lead Score'] }}",
+            "Budget": "={{ $json.fields.Budget }}",
+            "Property Type": "={{ $json.fields['Property Type'] }}",
+            "Location": "={{ $json.fields.Location }}",
+            "Timeline": "={{ $json.fields.Timeline }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Property Type",
+              "displayName": "Property Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Timeline",
+              "displayName": "Timeline",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Lead Score",
+              "displayName": "Lead Score",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Hot",
+                  "value": "Hot"
+                },
+                {
+                  "name": "Warm",
+                  "value": "Warm"
+                },
+                {
+                  "name": "Cold",
+                  "value": "Cold"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Date Added (Auto)",
+              "displayName": "Date Added (Auto)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1184,
+        128
+      ],
+      "id": "777f2ce6-4db3-4b5f-baa9-699e5597f3c6",
+      "name": "Create a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "2pBMp1aHn5IdkBwJ",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C099NF687B7",
+          "mode": "list",
+          "cachedResultName": "all-real-estate-ai-sales-qualification-bot"
+        },
+        "text": "=🔥 HOT Lead: {{ $json.fields.Name }}wants  {{ $json.fields['Property Type'] }} in {{ $json.fields.Location }}. Budget:{{ $json.fields.Budget }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1392,
+        128
+      ],
+      "id": "76f4cfe0-0765-497e-86c8-4c480f42c9c6",
+      "name": "Send a message",
+      "webhookId": "7ff83ba3-f9ed-4d6f-8741-bad8287ee450",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "15tDM5Jh861GP5Qo",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Cold Leads ",
+        "height": 224,
+        "width": 608,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1136,
+        544
+      ],
+      "typeVersion": 1,
+      "id": "5261c5c8-1bde-477c-8066-92c3442a2e70",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Warm Leads ",
+        "height": 224,
+        "width": 608
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1136,
+        304
+      ],
+      "typeVersion": 1,
+      "id": "794728c1-da02-4555-91bf-fdc9308a46ba",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "### Receiving the Data & Categorizing it",
+        "height": 256,
+        "width": 480,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        16,
+        288
+      ],
+      "typeVersion": 1,
+      "id": "7a43e766-138c-4a59-a227-7049021726b3",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "### Extracting Lead Type and Storing it in Airtable",
+        "height": 256,
+        "width": 384,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        512,
+        288
+      ],
+      "typeVersion": 1,
+      "id": "e41db015-d8a3-4566-9435-1fab2c4b10f6",
+      "name": "Sticky Note5"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Create or update a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create or update a record": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Create a record",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create a record1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create a record2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a record1": {
+      "main": [
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a record2": {
+      "main": [
+        [
+          {
+            "node": "Send a message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a record": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "32b0365c-8878-4992-b3de-bafc16de0740",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "27faaee9bab1f557f0250acd422695b3baf60b7ff18576bec4ef921ee8f88b33"
+  },
+  "id": "XLkSzXcnH22RIxAS",
+  "tags": []
+}
